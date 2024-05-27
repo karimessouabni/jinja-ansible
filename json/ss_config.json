@@ -1,0 +1,28 @@
+{
+    "version": "2.0",
+    "columns": 4,
+    "zoom": 0.5,
+    "tiles": [
+            {
+            "type": "HTTP-RAW",
+            "label": "ss:dev1",
+            "params": {
+                "url": "dev1S",
+                "regex": "(\\d+\\.\\d+\\.\\d+)"
+            }
+        },            {
+            "type": "HTTP-RAW",
+            "label": "ss:dev2",
+            "params": {
+                "url": "dev2S",
+                "regex": "(\\d+\\.\\d+\\.\\d+)"
+            }
+        },            {
+            "type": "HTTP-RAW",
+            "label": "ss:dev3",
+            "params": {
+                "url": "dev3S",
+                "regex": "(\\d+\\.\\d+\\.\\d+)"
+            }
+        }        ]
+}

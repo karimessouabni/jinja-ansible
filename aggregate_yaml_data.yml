@@ -1,0 +1,9 @@
+- name: Load YAML data
+  include_vars:
+    file: "{{ yaml_file.path }}"
+    name: "data"
+
+- name: Store data for each environment
+  set_fact:
+    env_data: "{{ env_data | combine({item: env_data[item] | default([]) + [data]}, recursive=True) }}"
+  loop: "{{ data.envs.keys() }}"

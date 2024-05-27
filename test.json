@@ -1,0 +1,18 @@
+{
+"version": "2.0"
+"columns": 4,
+"zoom": 0.5,
+"tiles": [ 
+    {
+        "type": "HTTP-RAW"
+        "label": "fm"
+        
+    }
+    ,   
+    {
+        "type": "HTTP-RAW"
+        "label": "ss"
+        
+    }
+         ]
+}

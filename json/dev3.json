@@ -1,0 +1,21 @@
+{
+    "version": "2.0",
+    "columns": 4,
+    "zoom": 0.5,
+    "tiles": [
+            {
+            "type": "HTTP-RAW",
+            "label": "fm:dev3",
+            "params": {
+                "url": "dev3",
+                "regex": "(\\d+.\\d+.\\d+)"
+            }
+        },            {
+            "type": "HTTP-RAW",
+            "label": "ss:dev3",
+            "params": {
+                "url": "dev3S",
+                "regex": "(\\d+.\\d+.\\d+)"
+            }
+        }        ]
+}

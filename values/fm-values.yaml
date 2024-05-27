@@ -1,0 +1,6 @@
+name: fm 
+verssion-suffix: '/HealthCheck.jsp'
+envs: 
+  dev1: "dev1"
+  dev2: "dev2"
+  dev3: "dev3"

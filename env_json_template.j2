@@ -1,0 +1,17 @@
+{
+    "version": "2.0",
+    "columns": 4,
+    "zoom": 0.5,
+    "tiles": [
+    {% for env, url in data.envs.items() %}
+        {
+            "type": "HTTP-RAW",
+            "label": "{{ data.name }}:{{ env }}",
+            "params": {
+                "url": "{{ url }}",
+                "regex": "(\\d+\\.\\d+\\.\\d+)"
+            }
+        }{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ]
+}

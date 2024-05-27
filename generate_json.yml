@@ -1,0 +1,50 @@
+---
+- name: Generate JSON files from YAML environment files
+  hosts: localhost
+  gather_facts: no
+  vars:
+    yaml_directory: "./values"
+    json_output_directory: "./json"  
+    environments: ['dev1', 'dev2', 'dev3']  # List of environments to process
+
+
+  tasks:
+    - name: Ensure JSON output directory exists
+      ansible.builtin.file:
+        path: "{{ json_output_directory }}"
+        state: directory
+        mode: '0755'
+
+    - name: Find all YAML files in the specified directory
+      find:
+        paths: "{{ yaml_directory }}"
+        patterns: "*.yml,*.yaml"
+      register: found_files
+
+    - name: Process each YAML file
+      include_tasks: process_and_generate.yml
+      loop: "{{ found_files.files }}"
+      loop_control:
+        loop_var: yaml_file
+
+
+
+
+    - name: Initialize an empty dictionary for environment data
+      set_fact:
+        env_data: {}
+
+    - name: Aggregate data from YAML files
+      include_tasks: aggregate_yaml_data.yml
+      loop: "{{ found_files.files }}"
+      loop_control:
+        loop_var: yaml_file
+
+    - name: Generate JSON files for each environment
+      include_tasks: generate_json_for_env.yml
+      loop: "{{ environments }}"
+      loop_control:
+        loop_var: env
+
+    - debug:
+        msg: "JSON files have been generated in {{ yaml_directory }}"

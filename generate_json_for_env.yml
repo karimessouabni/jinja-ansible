@@ -1,0 +1,6 @@
+- name: Generate JSON file for {{ env }}
+  template:
+    src: env_template.j2
+    dest: "{{ json_output_directory }}/{{ env }}.json"
+  vars:
+    values: "{{ env_data[env] }}"
