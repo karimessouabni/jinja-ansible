@@ -3,7 +3,13 @@
     file: "{{ yaml_file.path }}"
     name: "data"
 
-- name: Store data for each environment
-  set_fact:
-    env_data: "{{ env_data | combine({item: env_data[item] | default([]) + [data]}, recursive=True) }}"
-  loop: "{{ data.envs.keys() }}"
+- name: Aggregate data for each environment and collect environment names
+  block:
+    - name: Store data for each environment
+      set_fact:
+        env_data: "{{ env_data | combine({item: env_data[item] | default([]) + [data]}, recursive=True) }}"
+      loop: "{{ data.envs.keys() }}"
+
+    - name: Collect unique environment names
+      set_fact:
+        env_names: "{{ env_names | unique | list + data.envs.keys() | unique | list }}"
