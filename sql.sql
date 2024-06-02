@@ -1,17 +1,19 @@
-- hosts: localhost
-  gather_facts: no
+#!/bin/bash
 
-  vars:
-    mysql_user: 'your_mysql_username'
-    mysql_password: 'your_mysql_password'
-    db_name: 'your_database_name'
+# Database credentials
+DB_USER="your_user"
+DB_PASSWORD="your_password"
+DB_NAME="your_database"
+DB_HOST="localhost"
 
-  tasks:
-    - name: Show all tables in the database
-      shell: |
-        mysql -u{{ mysql_user }} -p'{{ mysql_password }}' -e "SHOW TABLES FROM {{ db_name }};"
-      register: show_tables
+# YAML file path
+YAML_FILE="path_to_your_file.yaml"
 
-    - name: Print all tables
-      debug:
-        msg: "{{ show_tables.stdout_lines }}"
+# Read the YAML file and extract values
+grep 'name:' $YAML_FILE | awk '{print $2}' | while read name; do
+  echo "Inserting $name into database..."
+  # MySQL command to insert the data into the database
+  mysql -h $DB_HOST -u $DB_USER -p"$DB_PASSWORD" $DB_NAME -e "INSERT INTO environment (env_id, env_name) VALUES ('$name', '$name');"
+done
+
+echo "Data injection complete."
