@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        API_URL = "https://your-api-url.com/endpoint"
+        API_KEY = "VotreCléAPI" // Utilisez une variable d'environnement sécurisée pour votre clé API
+    }
+
+    stages {
+        stage('Requête POST') {
+            steps {
+                script {
+                    // Définissez le corps de la requête
+                    def requestBody = '{"key1":"value1", "key2":"value2"}'
+
+                    // Effectuez une requête POST
+                    def response = httpRequest(
+                        url: "${API_URL}",
+                        method: 'POST',
+                        contentType: 'APPLICATION_JSON',
+                        requestBody: requestBody,
+                        customHeaders: [[name: 'Authorization', value: "Bearer ${API_KEY}"]]
+                    )
+
+                    // Affichez le statut de la réponse
+                    echo "Statut de la réponse: ${response.status}"
+                    echo "Corps de la réponse: ${response.content}"
+                }
+            }
+        }
+    }
+}
