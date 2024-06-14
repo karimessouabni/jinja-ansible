@@ -1,0 +1,32 @@
+import requests
+import json
+import os
+
+# Configuration
+vault_addr = os.getenv('VAULT_ADDR', 'http://127.0.0.1:8200')
+vault_token = os.getenv('VAULT_TOKEN')
+secrets_path = 'secret/data/'
+
+# Read secrets from a JSON file (as an example)
+with open('secrets.json') as f:
+    all_secrets = json.load(f)
+
+def push_secrets(vault_addr, vault_token, secrets_path, secrets):
+    headers = {
+        'X-Vault-Token': vault_token,
+        'Content-Type': 'application/json'
+    }
+
+    for path, secrets_dict in secrets.items():
+        url = f"{vault_addr}/v1/{secrets_path}{path}"
+        data = {"data": secrets_dict}
+
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        if response.status_code == 200:
+            print(f"Secrets pushed successfully to {path}!")
+        else:
+            print(f"Failed to push secrets to {path}. Status code: {response.status_code}")
+            print(response.json())
+
+# Push all secrets to Vault
+push_secrets(vault_addr, vault_token, secrets_path, all_secrets)
