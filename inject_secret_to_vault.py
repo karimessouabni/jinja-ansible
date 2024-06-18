@@ -1,10 +1,10 @@
-import json
+import yaml
 import hvac
 
-def load_secrets_from_file(file_path):
-    """Load secrets from a JSON file."""
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+def load_secrets_from_yaml(file_path):
+    """Load secrets from a YAML file."""
+    with open(file_path, 'r') as file:
+        data = yaml.safe_load(file)
     return data['data']
 
 def authenticate_to_vault(client, username, password):
@@ -15,9 +15,8 @@ def authenticate_to_vault(client, username, password):
     )
     client.token = response['auth']['client_token']
 
-def inject_secrets_to_vault(secrets, vault_url, vault_token, secret_path):
+def inject_secrets_to_vault(client, secrets, secret_path):
     """Inject secrets into Vault."""
-    client = hvac.Client(url=vault_url, token=vault_token)
     if client.is_authenticated():
         response = client.secrets.kv.v2.create_or_update_secret(
             path=secret_path,
@@ -36,8 +35,8 @@ def main():
     client = hvac.Client(url=vault_url)
     authenticate_to_vault(client, username, password)
 
-    secrets = load_secrets_from_file('secrets.json')
-    inject_secrets_to_vault(secrets, vault_url, client.token, secret_path)
+    secrets = load_secrets_from_yaml('secrets.yaml')
+    inject_secrets_to_vault(client, secrets, secret_path)
 
 if __name__ == '__main__':
     main()
