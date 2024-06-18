@@ -16,8 +16,14 @@ def inject_secrets_to_vault(vault_url, vault_token, secrets, secret_path):
     ]
     data = json.dumps({"data": secrets})
     curl_command = f'curl {" ".join(headers)} -X POST -d \'{data}\' {vault_url}/v1/{secret_path}'
+    
+    # Print the curl command to show the REST call
     print(f"Executing: {curl_command}")
+    
+    # Execute the curl command
     result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
+    
+    # Print the response from the curl command
     print("Response:", result.stdout)
 
 def main():
