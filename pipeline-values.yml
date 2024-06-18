@@ -1,25 +1,13 @@
-# - hosts: localhost
-#   gather_facts: no
-#   tasks:
-#     - name: Merge values.yml with values-prod.yml
-#       community.general.yaml:
-#         src: pipeline/values.yml
-#         data: "{{ lookup('file', 'pipeline/values-prod.yml') | from_yaml }}"
-#         output: values.yml
-#         merge: yes
-
-
-
 - hosts: localhost
   gather_facts: no
   tasks:
     - name: Load default values
-      ansible.builtin.include_vars:
+      include_vars:
         file: pipeline/values.yml
         name: default_values
 
     - name: Load production values
-      ansible.builtin.include_vars:
+      include_vars:
         file: pipeline/values-prod.yml
         name: prod_values
 
@@ -28,7 +16,7 @@
         merged_values: "{{ default_values | combine(prod_values, recursive=True) }}"
 
     - name: Write merged values to file
-      ansible.builtin.copy:
+      copy:
         dest: values.yml
         content: "{{ merged_values | to_nice_yaml }}"
         force: yes
