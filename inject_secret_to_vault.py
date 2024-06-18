@@ -1,28 +1,29 @@
 import yaml
-import hvac
+import json
+import subprocess
 
 def load_secrets_from_yaml(file_path):
     """Load secrets from a YAML file."""
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
-    return data['data']
+    return data['secrets']
 
 def inject_secrets_to_vault(vault_url, vault_token, secrets, secret_path):
-    """Inject secrets into Vault."""
-    client = hvac.Client(url=vault_url, token=vault_token)
-    if client.is_authenticated():
-        response = client.secrets.kv.v2.create_or_update_secret(
-            path=secret_path,
-            secret=secrets
-        )
-        print("Secrets injected:", response)
-    else:
-        print("Failed to authenticate with Vault.")
+    """Inject secrets into Vault using the REST API and curl."""
+    headers = [
+        f'-H "X-Vault-Token: {vault_token}"',
+        '-H "Content-Type: application/json"'
+    ]
+    data = json.dumps({"data": secrets})
+    curl_command = f'curl {" ".join(headers)} -X POST -d \'{data}\' {vault_url}/v1/{secret_path}'
+    print(f"Executing: {curl_command}")
+    result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
+    print("Response:", result.stdout)
 
 def main():
-    vault_url = 'http://localhost:8200'  # Adjust if your Vault server is not running locally
-    vault_token = 'your-root-token'  # Replace with your initial Vault root token
-    secret_path = 'secret/data/myapp'  # Adjust the path according to your Vault setup
+    vault_url = 'http://127.0.0.1:8200'  # Adjust if your Vault server is not running locally
+    vault_token = 'f3b09679-3001-009d-2b80-9c306ab81aa6'  # Replace with your Vault token
+    secret_path = 'secret/data/baz'  # Adjust the path according to your Vault setup
 
     secrets = load_secrets_from_yaml('secrets.yaml')
     inject_secrets_to_vault(vault_url, vault_token, secrets, secret_path)
