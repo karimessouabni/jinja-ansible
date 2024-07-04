@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+    
+    environment {
+        REPO_URL = 'https://github.com/your-username/your-repo.git'
+        BRANCH = 'main'
+        CREDENTIALS_ID = 'your-git-credentials-id'
+        ANSIBLE_PLAYBOOK = 'generate_values.yml'
+        GENERATED_FILE = 'generated_values.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the repository
+                git branch: "${BRANCH}",
+                    url: "${REPO_URL}",
+                    credentialsId: "${CREDENTIALS_ID}"
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                // Run the Ansible playbook to generate values
+                sh 'ansible-playbook ${ANSIBLE_PLAYBOOK}'
+            }
+        }
+
+        stage('Commit and Push Changes') {
+            steps {
+                script {
+                    // Check if the generated file exists
+                    if (fileExists("${GENERATED_FILE}")) {
+                        sh """
+                            git config user.name "jenkins"
+                            git config user.email "jenkins@example.com"
+                            git add ${GENERATED_FILE}
+                            git commit -m 'Add generated values file'
+                            git push origin ${BRANCH}
+                        """
+                    } else {
+                        error("Generated file ${GENERATED_FILE} not found!")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
