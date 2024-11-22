@@ -1,4 +1,5 @@
 import yaml
+from deepdiff import DeepDiff
 
 def load_yaml(file_path):
     """Charge un fichier YAML et retourne le contenu sous forme de dictionnaire."""
@@ -18,21 +19,29 @@ def normalize_data(data):
     else:
         return data
 
-def compare_yaml(file1, file2):
-    """Compare deux fichiers YAML après normalisation."""
-    yaml1 = load_yaml(file1)
-    yaml2 = load_yaml(file2)
+def get_yaml_differences(file1, file2):
+    """Retourne les différences entre deux fichiers YAML normalisés."""
+    yaml1 = normalize_data(load_yaml(file1))
+    yaml2 = normalize_data(load_yaml(file2))
 
-    normalized_yaml1 = normalize_data(yaml1)
-    normalized_yaml2 = normalize_data(yaml2)
+    # Utilisation de DeepDiff pour trouver les différences
+    differences = DeepDiff(yaml1, yaml2, ignore_order=True).to_dict()
+    return differences
 
-    return normalized_yaml1 == normalized_yaml2
+def save_differences_to_yaml(differences, output_file):
+    """Sauvegarde les différences dans un fichier YAML."""
+    with open(output_file, 'w', encoding='utf-8') as file:
+        yaml.dump(differences, file, allow_unicode=True, default_flow_style=False)
 
 # Exemple d'utilisation
 file1 = 'fichier1.yaml'
 file2 = 'fichier2.yaml'
+output_file = 'differences.yaml'
 
-if compare_yaml(file1, file2):
-    print("Les fichiers YAML sont identiques (ordre et entrées vides ignorés).")
+differences = get_yaml_differences(file1, file2)
+
+if differences:
+    save_differences_to_yaml(differences, output_file)
+    print(f"Les différences ont été sauvegardées dans {output_file}.")
 else:
-    print("Les fichiers YAML sont différents.")
+    print("Les fichiers YAML sont identiques.")
