@@ -1,10 +1,14 @@
 import yaml
 
-def remove_nulls(data):
+def remove_empty_dicts(data):
     if isinstance(data, dict):
-        return {k: remove_nulls(v) for k, v in data.items() if v is not None}
+        # Recursively process each key and filter out empty dictionaries
+        cleaned_dict = {k: remove_empty_dicts(v) for k, v in data.items() if v != {}}
+        return cleaned_dict if cleaned_dict else None  # Remove if resulting dict is empty
     elif isinstance(data, list):
-        return [remove_nulls(v) for v in data if v is not None]
+        # Recursively process lists
+        cleaned_list = [remove_empty_dicts(v) for v in data if v != {}]
+        return cleaned_list if cleaned_list else None  # Remove if resulting list is empty
     return data
 
 # Load the YAML file
@@ -14,8 +18,8 @@ output_file = "output.yaml"
 with open(input_file, 'r') as file:
     data = yaml.safe_load(file)
 
-# Remove null entries
-cleaned_data = remove_nulls(data)
+# Remove empty dictionaries
+cleaned_data = remove_empty_dicts(data)
 
 # Save the cleaned YAML
 with open(output_file, 'w') as file:
