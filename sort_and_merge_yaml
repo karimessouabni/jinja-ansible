@@ -1,0 +1,33 @@
+import yaml
+from collections import OrderedDict
+
+def sort_and_merge_yaml(input_file, output_file):
+    # Helper function to recursively sort and merge dictionaries
+    def sort_dict(d):
+        if isinstance(d, dict):
+            sorted_dict = OrderedDict()
+            for key in sorted(d.keys()):
+                sorted_dict[key] = sort_dict(d[key])
+            return sorted_dict
+        elif isinstance(d, list):
+            return [sort_dict(item) for item in d]
+        else:
+            return d
+
+    # Load the YAML file
+    with open(input_file, 'r') as f:
+        yaml_data = yaml.safe_load(f)
+
+    # Sort and merge the YAML structure
+    sorted_yaml = sort_dict(yaml_data)
+
+    # Save the sorted YAML back to a file
+    with open(output_file, 'w') as f:
+        yaml.dump(sorted_yaml, f, sort_keys=False, default_flow_style=False, allow_unicode=True)
+
+    print(f"YAML has been sorted and saved to {output_file}")
+
+# Example usage
+input_file = 'input.yaml'
+output_file = 'output.yaml'
+sort_and_merge_yaml(input_file, output_file)
