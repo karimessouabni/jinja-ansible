@@ -1,13 +1,10 @@
 import yaml
-from collections import OrderedDict
 
 def sort_and_merge_yaml(input_file, output_file):
     # Helper function to recursively sort and merge dictionaries
     def sort_dict(d):
         if isinstance(d, dict):
-            sorted_dict = OrderedDict()
-            for key in sorted(d.keys()):
-                sorted_dict[key] = sort_dict(d[key])
+            sorted_dict = {key: sort_dict(d[key]) for key in sorted(d.keys())}
             return sorted_dict
         elif isinstance(d, list):
             return [sort_dict(item) for item in d]
